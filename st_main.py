@@ -8,6 +8,20 @@ st.set_page_config(layout='wide', page_title="SSA Offshore Rigs", initial_sideba
 import gspread
 from gspread_dataframe import get_as_dataframe
 
+st.markdown(
+    """
+<style>
+[data-testid="stMetricValue"] {
+    font-size: 20px;
+}
+#MainMenu {visibility: hidden;}
+footer {visibility: visible;}
+footer:after{content:'Made by Tahir Elfaki'; display:block; position:relative}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
 st.title("🌍 Sub Sahara Africa Offshore Rigs")
 gc = gspread.service_account("credentials.json")
 ws = gc.open("InfieldRigs").worksheet("info")
