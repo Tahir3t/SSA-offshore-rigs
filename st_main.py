@@ -175,3 +175,9 @@ for index, row in df.iterrows():
             st.metric("Hookload Capacity (lb)", row['Hookload Capacity (lb)'])
             st.metric("Current Country", row['Current Country'])
             st.metric("Operating Company", row['Operating Company'])
+st.markdown("---")
+st.markdown("#### Download Results")
+st.markdown("###### 📥 Click the below button to download the results as CSV file")
+st.download_button("Download Results",
+                    df.to_csv(),
+                    mime= 'text/csv')
