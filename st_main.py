@@ -1,13 +1,14 @@
+from google.oauth2 import service_account
+from gspread_pandas import Spread, Client
+import numpy as np
 import pandas as pd
 from pandas.api.types import (
     is_categorical_dtype,
     is_numeric_dtype)
 import streamlit as st
-import numpy as np
-st.set_page_config(layout='wide', page_title="SSA Offshore Rigs", initial_sidebar_state="expanded")
-import gspread
-from gspread_dataframe import get_as_dataframe
 
+
+st.set_page_config(layout='wide', page_title="SSA Offshore Rigs", initial_sidebar_state="expanded")
 st.markdown(
     """
 <style>
@@ -23,16 +24,23 @@ footer:after{content:'Made by Tahir Elfaki'; display:block; position:relative}
 )
 
 st.title("🌍 Sub Sahara Africa Offshore Rigs")
-gc = gspread.service_account("credentials.json")
-ws = gc.open("InfieldRigs").worksheet("info")
-g_sheet = get_as_dataframe(ws)
+
+scope = ["https://www.googleapis.com/auth/spreadsheets",
+         "https://www.googleapis.com/auth/drive"]
+
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"], scopes = scope)
+
+client = Client(scope=scope, creds=credentials)
+spreadsheetname = "InfieldRigs"
+spread = Spread(spreadsheetname, client=client)
+g_sheet = spread.sheet_to_df(sheet="info", index=0)
 wanted_status = ["Cold Stacked", "Enroute", "Operational", "Ready Stacked"]
 data = g_sheet[g_sheet['operating_status'].isin(wanted_status)]
 data = data.replace(",", "", regex=True)
 data['drawworks_hp'] = data['drawworks_hp'].replace("--", 0)
 data['operating_company'] = data['operating_company'].replace(np.nan, "--")
-# data[["max_water_depth_ft", "max_drill_depth_ft", "drawworks_hp", "hookload_cap_lbs"]] = data[["max_water_depth_ft", "max_drill_depth_ft", "drawworks_hp", "hookload_cap_lbs"]].apply(pd.to_numeric, errors='ignore')
-to_numeric_col = ["max_water_depth_ft", "max_drill_depth_ft", "drawworks_hp", "hookload_cap_lbs"]
+to_numeric_col = ["year_built", "max_water_depth_ft", "max_drill_depth_ft", "drawworks_hp", "hookload_cap_lbs"]
 for x in to_numeric_col:
     data[x] = pd.to_numeric(data[x])
 
@@ -89,8 +97,6 @@ semi_tender = df[df['Rig Type'] == 'Semi-Tender']['Rig Type'].value_counts().sum
 semisub_rigs = df[df['Rig Type'] == 'Semisub']['Rig Type'].value_counts().sum()
 tender_rigs = df[df['Rig Type'] == 'Tender Rig']['Rig Type'].value_counts().sum()
 
-
-
 a1, a2 = st.columns(2)
 with a1:
     st.metric("No. of Offshore Rigs", rigs_number)
@@ -146,7 +152,6 @@ if client_df['Operating Company'].nunique() > 0:
 else:
     st.write(f"There are no operating companies. However, the {df['Rig Name'].nunique()} offshore rigs are in {df['Current Country'].nunique()} countries.")
     st.dataframe(df[['Operating Company', 'Current Country' ,'Rig Name', 'Rig Type', 'Operational Status']].sort_values(by=['Current Country']).reset_index(drop=True))
-# st.write(df['Operating Company'].unique())
 
 st.markdown("---")
 st.markdown("#### Details Card")
