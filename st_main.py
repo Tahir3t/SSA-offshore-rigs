@@ -185,5 +185,5 @@ st.markdown("---")
 st.write('''
          DISCLAIMER: All data provided on this website is for reference purposes only. 
          We make our best efforts to ensure the accuracy of the data, but it is given without express or implied warranty as to its accuracy, 
-         reliability, or fitness for any particular application
+         reliability, or fitness for any particular application.
          ''')
