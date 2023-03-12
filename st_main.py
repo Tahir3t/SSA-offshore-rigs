@@ -44,7 +44,7 @@ to_numeric_col = ["year_built", "max_water_depth_ft", "max_drill_depth_ft", "dra
 for x in to_numeric_col:
     data[x] = pd.to_numeric(data[x])
 
-
+data = data.drop_duplicates(subset="rig_name")
 
 df = data.copy()
 df = df.drop(["current_region"], axis=1)
