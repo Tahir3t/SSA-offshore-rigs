@@ -34,9 +34,11 @@ credentials = service_account.Credentials.from_service_account_info(
 client = Client(scope=scope, creds=credentials)
 spreadsheetname = "InfieldRigs"
 spread = Spread(spreadsheetname, client=client)
-g_sheet = spread.sheet_to_df(sheet="info", index=0)
+g_sheet = spread.sheet_to_df(sheet="globalinfo", index=0)
 wanted_status = ["Cold Stacked", "Enroute", "Operational", "Ready Stacked"]
+wanted_regions = ["West Africa", "South & East Africa"]
 data = g_sheet[g_sheet['operating_status'].isin(wanted_status)]
+data = data[data['current_region'].isin(wanted_regions)]
 data = data.replace(",", "", regex=True)
 data['drawworks_hp'] = data['drawworks_hp'].replace("--", 0)
 data['operating_company'] = data['operating_company'].replace(np.nan, "--")
